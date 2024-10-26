@@ -6,8 +6,10 @@ import (
 	"time"
 )
 
+const sensors_count = 3
+
 func main() {
-	bytes := make([]byte, 6)
+	bytes := make([]byte, sensors_count*2)
 	addr := net.UDPAddr{
 		Port: 5555,
 		IP:   net.ParseIP("0.0.0.0"),
@@ -23,10 +25,9 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		values := [3]uint16{
-			(uint16(bytes[1]))<<8 | uint16(bytes[0]),
-			(uint16(bytes[3]))<<8 | uint16(bytes[2]),
-			(uint16(bytes[5]))<<8 | uint16(bytes[4]),
+		values := [sensors_count]uint16{}
+		for i := range sensors_count {
+			values[i] = (uint16(bytes[i*2+1]))<<8 | uint16(bytes[i*2])
 		}
 		fmt.Printf("interval: %vms distances: %v\n", time-prev_time, values)
 		prev_time = time
